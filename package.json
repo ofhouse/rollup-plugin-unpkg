@@ -7,9 +7,21 @@
   ],
   "author": "osdevisnot <osdevisnot@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
   "dependencies": {
     "estree-walker": "^0.6.0",
     "magic-string": "^0.25.2",
     "read-pkg": "^5.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.6.2",
+    "@babel/preset-react": "^7.0.0",
+    "babel-jest": "^24.9.0",
+    "jest": "^24.9.0",
+    "rollup": "^1.21.4",
+    "rollup-plugin-babel": "^4.3.3"
   }
 }

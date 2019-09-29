@@ -1,8 +1,13 @@
 # rollup-plugin-unpkg
 
 A rollup plugin to convert ES imports to UNPKG urls.
+The plugin also works with babel
 
 ## Usage
+
+```sh
+npm i --save @fwh/rollup-plugin-unpkg
+```
 
 Add this plugin to `rollup.config.js`:
 

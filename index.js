@@ -1,19 +1,25 @@
+const path = require('path');
 const readPkg = require('read-pkg');
 const { walk } = require('estree-walker');
 const MagicString = require('magic-string');
 const padStr = str => `'${str}'`;
 
-module.exports = ({ transform = (name, version) => `https://unpkg.com/${name}@${version}?type=module` } = {}) => {
-  const pkg = readPkg.sync();
+module.exports = ({
+  transform = (name, version) => `https://unpkg.com/${name}@${version}?type=module`,
+} = {}) => {
   const cache = {};
+  let pkg;
+
   return {
     name: 'unpkg',
     options(opts) {
-      let deps = (pkg && pkg.dependencies) || {};
+      // Read the package.json from the project we are building
+      const projectPath = path.dirname(opts.input);
+      pkg = readPkg.sync({ cwd: projectPath });
 
-      Object.keys(deps).forEach(dep => {
-        const manifest = readPkg.sync(require.resolve(`${dep}/package.json`));
-        if (manifest.module) cache[manifest.name] = transform(manifest.name, manifest.version);
+      let deps = (pkg && pkg.dependencies) || {};
+      Object.entries(deps).forEach(([name, version]) => {
+        cache[name] = transform(name, version);
       });
 
       let external = Object.values(cache);
@@ -30,16 +36,16 @@ module.exports = ({ transform = (name, version) => `https://unpkg.com/${name}@${
           if (node.type === 'Literal' && parent.type === 'ImportDeclaration') {
             if (cache[node.value])
               magicString.overwrite(node.start, node.end, padStr(cache[node.value]), {
-                storeName: false
+                storeName: false,
               });
             return node;
           }
-        }
+        },
       });
       return {
         code: magicString.toString(),
-        map: magicString.generateMap()
+        map: magicString.generateMap(),
       };
-    }
+    },
   };
 };
